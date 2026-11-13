@@ -56,16 +56,16 @@ async function openCamera(which){
  controls();
 }
 function clearCanvas(){cancelAnimationFrame(raf);if(drawStream){drawStream.getVideoTracks().forEach(t=>t.stop());drawStream=null}}
-function stopSound(){if($('audio').src)$('audio').pause();if(micSource){try{micSource.disconnect()}catch(e){}micSource=null}if(audioDestination){try{audioDestination.disconnect()}catch(e){}audioDestination=null}if(musicSource){try{musicSource.disconnect()}catch(e){}musicSource=null}if(audioContext){audioContext.close().catch(()=>{});audioContext=null}}
+function stopSound(){if($('audio').src)$('audio').pause();if(micSource){try{micSource.disconnect()}catch(e){}micSource=null}if(musicSource){try{musicSource.disconnect()}catch(e){}}audioDestination=null;}
 async function audioForRecording(){
  const song=$('audio');const hasMusic=!!song.src;
  if(!hasMusic)return stream.getAudioTracks()[0]||null;
  const AC=window.AudioContext||window.webkitAudioContext;
  if(!AC){status('Music mixing unsupported in this browser');return stream.getAudioTracks()[0]||null}
- audioContext=new AC();audioDestination=audioContext.createMediaStreamDestination();
+ if(!audioContext||audioContext.state==='closed')audioContext=new AC();audioDestination=audioContext.createMediaStreamDestination();
  const mic=stream.getAudioTracks()[0];
  if(mic){micSource=audioContext.createMediaStreamSource(new MediaStream([mic]));micSource.connect(audioDestination)}
- musicSource=audioContext.createMediaElementSource(song);musicSource.connect(audioDestination);musicSource.connect(audioContext.destination);
+ if(!musicSource)musicSource=audioContext.createMediaElementSource(song);musicSource.connect(audioDestination);musicSource.connect(audioContext.destination);
  await audioContext.resume();song.currentTime=0;await song.play();
  return audioDestination.stream.getAudioTracks()[0]||mic||null;
 }
@@ -90,7 +90,7 @@ function showVideo(blob){
  $('shareNotice').hidden=false;status('Video ready. Play it or download from Settings.');controls();$('playback').play().catch(()=>{});
 }
 $('record').onclick=async()=>{
- if(recording){recording=false;recorder.stop();clearCanvas();stopSound();controls();return}
+ if(recording){recording=false;recorder.stop();clearCanvas();controls();return}
  if(!stream||typeof MediaRecorder==='undefined'){status('Recording is unsupported here');return}
  try{
   recording=true;const videoSource=captureSource();const mixedAudio=await audioForRecording();
