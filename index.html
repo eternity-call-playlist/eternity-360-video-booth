@@ -46,9 +46,9 @@ async function uploadAndShowQR(blob){
  $('qrStatus').textContent='Finishing video share…';
  await cloudCall({action:'finish',id:item.id,token:item.token});
  const link=shareURL(item.id,item.token);
- if(!window.QRCode?.toCanvas)throw Error('QR library unavailable. Open the video link below.');
- try{await QRCode.toCanvas($('qrCanvas'),link,{width:230,margin:2,color:{dark:'#111111',light:'#ffffff'}});$('qrCanvas').hidden=false;}catch(e){console.warn('QR render issue',e)}
  $('qrLink').href=link;$('qrLink').hidden=false;
+ if(window.QRCode?.toCanvas){try{await QRCode.toCanvas($('qrCanvas'),link,{width:230,margin:2,color:{dark:'#111111',light:'#ffffff'}});$('qrCanvas').hidden=false;}catch(e){console.warn('QR render issue',e)}}
+
  $('qrStatus').textContent=$('qrCanvas').hidden?'Video ready. Open the link below.':'Video ready! Scan QR to download.';
  status('Video uploaded. QR code ready.');pendingCloudBlob=null;
  }catch(e){$('qrStatus').textContent='Upload/QR not ready: '+e.message;$('qrRetry').hidden=false;status('Video kept on this device. '+e.message)}
