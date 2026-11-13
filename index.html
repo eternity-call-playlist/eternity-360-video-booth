@@ -19,7 +19,7 @@ header{position:absolute;z-index:8;top:calc(8px + env(safe-area-inset-top));righ
 <div id="stage"><video id="preview" autoplay muted playsinline></video><video id="playback" controls playsinline hidden></video><img id="frame" alt="Selected transparent frame" hidden><div id="hint">Camera permission may be requested</div><span id="busy" hidden>● REC</span><section id="qrPanel" hidden><h2>Customer QR Code</h2><p id="qrStatus">Uploading video…</p><p style="font-size:13px;color:#f1cb70;max-width:320px">Operator screen: Show this QR to the customer. Username and Password are entered only on the customer phone after scanning.</p><canvas id="qrCanvas" width="230" height="230" hidden></canvas><a id="qrLink" target="_blank" rel="noopener noreferrer" hidden>Customer link (for sharing only)</a><button id="qrRetry" hidden type="button">Retry Upload</button><button id="qrClose" type="button">Back to Camera</button></section><section id="viewerPanel" hidden><h2>Eternity 360</h2><p id="viewerStatus">Enter mobile number and password to download.</p><form id="viewerForm" style="width:min(100%,340px);display:flex;flex-direction:column;gap:12px;text-align:left"><label for="viewerMobile">Username — Mobile Number</label><input id="viewerMobile" type="tel" inputmode="numeric" autocomplete="tel-national" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" required style="padding:12px;border-radius:8px"><label for="viewerPassword">Password — Mobile number followed by 123</label><input id="viewerPassword" type="password" autocomplete="off" placeholder="Mobile number + 123" required style="padding:12px;border-radius:8px"><label style="font-size:12px"><input id="viewerConsent" type="checkbox" required> I agree to save my mobile number for this video download.</label><button type="submit" style="background:#e8c16b;color:#111;border:0;border-radius:8px;padding:13px;font-weight:bold">Continue to Download</button></form><a id="viewerDownload" hidden>Download your video</a></section></div>
 <div id="bottom"><button class="icon" id="retake" aria-label="Return to camera" title="Return to camera" hidden><svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 3 7"/><path d="M3 4v7h7"/></svg></button><button id="record" aria-label="Start recording" disabled><span></span><output id="recordTime" aria-hidden="true"></output></button><button class="icon" id="switch" aria-label="Switch front and back camera" title="Switch camera"><svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><path d="M8 12a4 4 0 0 1 7-2m0-3v3h-3M16 14a4 4 0 0 1-7 2m0 3v-3h3"/></svg></button></div>
 <div id="status" role="status" aria-live="polite"></div>
-<section id="panel" hidden><button id="fullscreenBtn" type="button">Enter Full Screen</button><p><small>For the cleanest camera view on Android, use Chrome menu → Add to Home screen, then open the installed app.</small></p><strong>Frames & Settings</strong><label for="frameInput">Add transparent PNG frame</label><input id="frameInput" type="file" accept=".png,image/png"><button id="removeFrame">Remove frame</button><small>Only transparent PNG frames are accepted. Images without transparency could cover the camera and will be rejected.</small><label for="quality">Video quality</label><select id="quality"><option value="720">720p</option><option value="1080" selected>1080p (if supported)</option></select><label for="zoom">Camera Zoom</label><select id="zoom"><option value="0.5">0.5x (ultrawide if supported)</option><option value="1" selected>1x (normal)</option><option value="2">2x (zoom in)</option></select><small id="zoomHelp">Zoom availability depends on the phone and browser. Unsupported 0.5x cannot be forced.</small><label for="duration">Recording duration</label><select id="duration"><option value="30">30 seconds</option><option value="40" selected>40 seconds</option><option value="50">50 seconds</option></select><label for="finishBeeps">End-of-recording alert</label><select id="finishBeeps"><option value="3" selected>3 loud beeps</option><option value="2">2 beeps</option><option value="1">1 beep</option><option value="0">Off</option></select><small>Beep alerts play after auto-stop, not inside the recorded video. Device volume must be audible.</small><label for="effects">Automatic video effects</label><select id="effects"><option value="on" selected>Zoom + Slow Motion + Reverse (40/50 sec)</option><option value="off">Normal recording (no automatic effects)</option></select><small id="effectHelp">40 sec: 10 normal + 10 zoom + 10 slow replay + 10 reverse replay. 50 sec: 20 normal + 10 zoom + 10 slow replay + 10 reverse replay. Video stays 40/50 sec. Effects are video-only; music continues normally. Phone performance may affect smoothness.</small><label for="music">Music file (included in recording)</label><input id="music" type="file" accept="audio/*"><audio id="audio" controls></audio><button id="removeMusic" type="button">Remove saved music</button><small id="savedMedia">Frame and music will be remembered on this device.</small><small>Music and microphone audio are mixed into the recording on supported browsers. Allow microphone access for voice.</small><label for="gallery">Open video from gallery</label><input id="gallery" type="file" accept="video/*"><p><a id="download" hidden>Download video</a></p><p><strong>Automatic QR sharing:</strong> After recording, the video uploads to private storage and a QR code appears when ready. Internet required; upload time depends on network speed.</p><p id="shareNotice" hidden>QR video sharing requires secure online video storage and client access setup. The video is currently saved only on your device.</p></section></main><script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script><script>
+<section id="panel" hidden><button id="fullscreenBtn" type="button">Enter Full Screen</button><p><small>For the cleanest camera view on Android, use Chrome menu → Add to Home screen, then open the installed app.</small></p><strong>Frames & Settings</strong><label for="frameInput">Add transparent PNG frame</label><input id="frameInput" type="file" accept=".png,image/png"><button id="removeFrame">Remove frame</button><small>Only transparent PNG frames are accepted. Images without transparency could cover the camera and will be rejected.</small><label for="quality">Video quality</label><select id="quality"><option value="720">720p</option><option value="1080" selected>1080p (if supported)</option></select><label for="zoom">Camera Zoom</label><select id="zoom"><option value="0.5">0.5x (ultrawide if supported)</option><option value="1" selected>1x (normal)</option><option value="2">2x (zoom in)</option></select><small id="zoomHelp">Zoom availability depends on the phone and browser. Unsupported 0.5x cannot be forced.</small><label for="duration">Recording duration</label><select id="duration"><option value="30">30 seconds</option><option value="40" selected>40 seconds</option><option value="50">50 seconds</option></select><label for="finishBeeps">End-of-recording alert</label><select id="finishBeeps"><option value="3" selected>3 loud beeps</option><option value="2">2 beeps</option><option value="1">1 beep</option><option value="0">Off</option></select><small>Beep alerts play after auto-stop, not inside the recorded video. Device volume must be audible.</small><label for="effects">Automatic video effects</label><select id="effects"><option value="on" selected>Reverse only (40/50 sec)</option><option value="off">Normal recording (no automatic effects)</option></select><small id="effectHelp">40 sec: 30 normal + 10 reverse. 50 sec: 40 normal + 10 reverse. 30 sec has no effects.</small><label for="music">Music file (included in recording)</label><input id="music" type="file" accept="audio/*"><audio id="audio" controls></audio><button id="removeMusic" type="button">Remove saved music</button><small id="savedMedia">Frame and music will be remembered on this device.</small><small>Music and microphone audio are mixed into the recording on supported browsers. Allow microphone access for voice.</small><label for="gallery">Open video from gallery</label><input id="gallery" type="file" accept="video/*"><p><a id="download" hidden>Download video</a></p><p><strong>Automatic QR sharing:</strong> After recording, the video uploads to private storage and a QR code appears when ready. Internet required; upload time depends on network speed.</p><p id="shareNotice" hidden>QR video sharing requires secure online video storage and client access setup. The video is currently saved only on your device.</p></section></main><script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script><script>
 const $=id=>document.getElementById(id);
 let stream=null,recorder=null,chunks=[],camera='environment',videoURL=null,frameURL=null,frameImage=null,drawStream=null,raf=0,recording=false,opening=0,audioContext=null,audioDestination=null,musicSource=null,micSource=null,musicObjectURL=null,recordTimer=null,zoomValue=1,zoomHardware=false,autoFinished=false,progressRaf=0,recordStartedAt=0,recordDurationMs=0;
 // Store user-selected media locally. Never upload guests' videos without configured private storage.
@@ -111,7 +111,7 @@ async function openCamera(which){
  controls();
 }
 async function applyZoom(notify=true){
- const target=Number($('zoom').value),track=stream?.getVideoTracks()?.[0];if(!track)return;
+ const target=$('duration').value==='30'?1:Number($('zoom').value),track=stream?.getVideoTracks()?.[0];if(!track)return;
  const caps=track.getCapabilities?.()||{};zoomValue=target;zoomHardware=false;
  $('preview').style.transform=(camera==='user'?'scaleX(-1) ':'')+'scale(1)';
  if(caps.zoom&&target>=caps.zoom.min&&target<=caps.zoom.max){
@@ -153,53 +153,39 @@ function captureSource(){
   cv.width=portraitWidth;cv.height=Math.round(portraitWidth*16/9);
  const ctx=cv.getContext('2d'),scaleWidth=Math.min(cv.width,320);
  const sampleW=scaleWidth,sampleH=Math.round(scaleWidth*cv.height/cv.width);
- const zoomStart=duration-30,slowStart=duration-20,reverseStart=duration-10;
- const slowFrames=[],reverseFrames=[],sampleRate=6,interval=1000/sampleRate;
+
+ const reverseStart=duration-10,reverseFrames=[],sampleRate=8,interval=1000/sampleRate;
  let begin=performance.now(),lastSample=-Infinity;
  const snapshot=()=>{
-   const snap=document.createElement('canvas');snap.width=sampleW;snap.height=sampleH;
-   snap.getContext('2d').drawImage(cv,0,0,sampleW,sampleH);
-   return snap;
+  const snap=document.createElement('canvas');snap.width=sampleW;snap.height=sampleH;
+  snap.getContext('2d').drawImage(cv,0,0,sampleW,sampleH);return snap;
  };
- const drawLive=(z=1)=>{
-   let cw=cv.width,ch=cv.height;ctx.clearRect(0,0,cw,ch);
-   if(v.readyState>=2){
-     const vw=v.videoWidth,vh=v.videoHeight,base=Math.max(cw/vw,ch/vh),
-       factor=(zoomHardware?1:zoomValue)*z,w=vw*base*factor,h=vh*base*factor;
-     ctx.save();if(camera==='user'){ctx.translate(cw,0);ctx.scale(-1,1)}
-     ctx.drawImage(v,(cw-w)/2,(ch-h)/2,w,h);ctx.restore();
-   }
+ const drawLive=()=>{
+  const cw=cv.width,ch=cv.height;ctx.clearRect(0,0,cw,ch);
+  if(v.readyState>=2){
+   const vw=v.videoWidth,vh=v.videoHeight;
+   // Fit the full source camera frame to avoid the excessive front-camera crop.
+   const fit=Math.min(cw/vw,ch/vh);
+   const factor=$('duration').value==='30'?1:(zoomHardware?1:zoomValue);
+   const w=vw*fit*factor,h=vh*fit*factor;
+   ctx.save();if(camera==='user'){ctx.translate(cw,0);ctx.scale(-1,1)}
+   ctx.drawImage(v,(cw-w)/2,(ch-h)/2,w,h);ctx.restore();
+  }
  };
  const overlay=()=>{if(frameImage?.complete&&frameImage.naturalWidth)ctx.drawImage(frameImage,0,0,cv.width,cv.height)};
  function draw(){
-   if(!recording)return;
-   const elapsed=(performance.now()-begin)/1000;
-   if(!effects){drawLive();overlay()}
-   else if(elapsed<zoomStart){
-     drawLive();overlay();
-     if(elapsed>=zoomStart-5&&performance.now()-lastSample>=interval){
-       slowFrames.push(snapshot());lastSample=performance.now();
-     }
-   }else if(elapsed<slowStart){
-     // Zoom in smoothly over ten seconds and record the footage for reverse replay.
-     drawLive(1+Math.min(1,(elapsed-zoomStart)/10));overlay();
-     if(performance.now()-lastSample>=interval){
-       reverseFrames.push(snapshot());lastSample=performance.now();
-     }
-   }else if(elapsed<reverseStart){
-     // Replay 5 seconds of captured video over 10 seconds (half-speed visuals).
-     if(slowFrames.length){
-       const i=Math.min(slowFrames.length-1,Math.floor((elapsed-slowStart)/10*slowFrames.length));
-       ctx.drawImage(slowFrames[i],0,0,cv.width,cv.height);
-     }else{drawLive();overlay()}
-   }else{
-     // Replay recorded zoom footage in reverse across the final ten seconds.
-     if(reverseFrames.length){
-       const i=Math.max(0,reverseFrames.length-1-Math.floor((elapsed-reverseStart)/10*reverseFrames.length));
-       ctx.drawImage(reverseFrames[i],0,0,cv.width,cv.height);
-     }else{drawLive();overlay()}
+  if(!recording)return;
+  const elapsed=(performance.now()-begin)/1000;
+  if(!effects||elapsed<reverseStart){
+   drawLive();overlay();
+   if(effects&&elapsed>=reverseStart-10&&performance.now()-lastSample>=interval){
+    reverseFrames.push(snapshot());lastSample=performance.now();
    }
-   raf=requestAnimationFrame(draw);
+  }else if(reverseFrames.length){
+   const i=Math.max(0,reverseFrames.length-1-Math.floor((elapsed-reverseStart)/10*reverseFrames.length));
+   ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(reverseFrames[i],0,0,cv.width,cv.height);
+  }else{drawLive();overlay()}
+  raf=requestAnimationFrame(draw);
  }
  draw();drawStream=cv.captureStream(30);return drawStream;
 }
@@ -223,7 +209,7 @@ $('record').onclick=async()=>{
   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
   recorder.onerror=e=>status('Recording error: '+(e.error?.message||'unknown'));
   recorder.onstop=()=>{stopProgress(autoFinished);if(recordTimer)clearTimeout(recordTimer);recordTimer=null;clearCanvas();stopSound();if(autoFinished)playFinishBeeps();if(chunks.length)showVideo(new Blob(chunks,{type:recorder.mimeType||'video/webm'}));else status('No recording captured. Please retry.');autoFinished=false};
-  recorder.start(250);startProgress(Number($('duration').value));recordTimer=setTimeout(()=>{if(recording&&recorder?.state==='recording'){autoFinished=true;stopProgress(true);recording=false;recorder.stop();controls()}},Number($('duration').value)*1000);status('Recording '+$('duration').value+' seconds'+($('effects').value==='on'&&Number($('duration').value)>=40?' with auto effects':'')+'. Tap red square to stop early.');controls();
+  recorder.start(250);startProgress(Number($('duration').value));recordTimer=setTimeout(()=>{if(recording&&recorder?.state==='recording'){autoFinished=true;stopProgress(true);recording=false;recorder.stop();controls()}},Number($('duration').value)*1000);status('Recording '+$('duration').value+' seconds'+($('effects').value==='on'&&Number($('duration').value)>=40?' with reverse effect':'')+'. Tap red square to stop early.');controls();
  }catch(e){stopProgress();recording=false;if(recordTimer)clearTimeout(recordTimer);recordTimer=null;clearCanvas();stopSound();status('Recording error: '+e.message);controls()}
 };
 $('switch').onclick=()=>openCamera(camera==='user'?'environment':'user');
@@ -257,8 +243,8 @@ $('frameInput').onchange=e=>{
 $('removeFrame').onclick=()=>{frameImage=null;if(frameURL)URL.revokeObjectURL(frameURL);frameURL=null;$('frame').hidden=true;$('frame').removeAttribute('src');assetDel('frame').catch(()=>{});status('Saved frame removed')};
 $('quality').onchange=()=>openCamera(camera);
 $('zoom').onchange=()=>{localStorage.setItem('eternity360-zoom',$('zoom').value);applyZoom()};
-function syncDurationEffects(){const normal=$('duration').value==='30';$('effects').disabled=normal||recording;$('effectHelp').textContent=normal?'30 seconds: Normal video only. No automatic zoom, slow motion, or reverse.':'40 sec: 10 normal + 10 zoom + 10 slow replay + 10 reverse replay. 50 sec: 20 normal + 10 zoom + 10 slow replay + 10 reverse replay. Video stays 40/50 sec.';}
- $('duration').onchange=()=>{localStorage.setItem('eternity360-duration',$('duration').value);syncDurationEffects();status($('duration').value==='30'?'30 seconds: normal video only, no automatic effects':'Auto-stop after '+$('duration').value+' seconds')};
+function syncDurationEffects(){const normal=$('duration').value==='30';$('effects').disabled=normal||recording;$('effectHelp').textContent=normal?'30 seconds: Normal 1x video, no automatic effects.':'40 sec: 30 normal + 10 reverse. 50 sec: 40 normal + 10 reverse.';if(normal){$('zoom').value='1';zoomValue=1;zoomHardware=false;localStorage.setItem('eternity360-zoom','1');if(stream)applyZoom(false);}}
+ $('duration').onchange=()=>{localStorage.setItem('eternity360-duration',$('duration').value);syncDurationEffects();status($('duration').value==='30'?'30 seconds: normal 1x video, no effects':'Auto-stop after '+$('duration').value+' seconds')};
 $('finishBeeps').onchange=()=>localStorage.setItem('eternity360-beeps',$('finishBeeps').value);
 $('effects').onchange=()=>{localStorage.setItem('eternity360-effects',$('effects').value);status('Automatic effects: '+$('effects').value)};
 $('music').onchange=e=>{const f=e.target.files?.[0];if(!f)return;applyMusic(f);assetSet('music',f).then(()=>status('Music saved for every future recording: '+f.name)).catch(()=>status('Music loaded, but could not be saved for next visit.'))};
@@ -267,7 +253,7 @@ $('gallery').onchange=e=>{const f=e.target.files?.[0];if(f){$('playback').src=UR
 window.addEventListener('pagehide',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());if(recordTimer)clearTimeout(recordTimer);clearCanvas();stopSound()});
 if(['0.5','1','2'].includes(localStorage.getItem('eternity360-zoom')))$('zoom').value=localStorage.getItem('eternity360-zoom');
 if(['30','40','50'].includes(localStorage.getItem('eternity360-duration')))$('duration').value=localStorage.getItem('eternity360-duration');
-if(['on','off'].includes(localStorage.getItem('eternity360-effects')))$('effects').value=localStorage.getItem('eternity360-effects');
+$('effects').value='on';localStorage.setItem('eternity360-effects','on');
 if(['0','1','2','3'].includes(localStorage.getItem('eternity360-beeps')))$('finishBeeps').value=localStorage.getItem('eternity360-beeps');
  syncDurationEffects();
 controls();if(new URLSearchParams(location.search).has('share')){$('viewerPanel').hidden=false;$('bottom').hidden=true;$('hint').hidden=true;$('status').hidden=true;openSharedVideo()}else{restoreAssets();openCamera('environment')}
