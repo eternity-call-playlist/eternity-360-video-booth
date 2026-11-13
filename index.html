@@ -1,53 +1,73 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090909"><title>Eternity 360 • Video Booth</title>
-<style>
-:root{color-scheme:dark;font-family:system-ui,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:#090909;color:#f7f0db}main{max-width:750px;margin:auto;padding:22px 16px 45px}h1{text-align:center;color:#e8c36a;letter-spacing:.06em;font-size:26px}p{color:#bdb7a9}.view{position:relative;background:#171717;border:1px solid #6c562b;border-radius:17px;overflow:hidden;aspect-ratio:9/12;max-height:55vh;display:grid;place-items:center}video#preview{width:100%;height:100%;object-fit:cover}video.mirror{transform:scaleX(-1)}.hint{position:absolute;inset:auto 12px 12px;background:#000a;border-radius:8px;padding:8px;font-size:13px;text-align:center}.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}button,.filelabel{cursor:pointer;font:inherit;padding:13px;border-radius:11px;border:1px solid #84672f;color:#f9e3ac;background:#211b13;text-align:center}button.active,button.primary{background:#dfb85c;color:#18130c;font-weight:700}button:disabled{opacity:.4;cursor:not-allowed}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions>*{flex:1 1 135px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}label{font-weight:650}input[type=file]{max-width:100%}input[type=range]{width:100%}#status{min-height:2em;color:#ead08b}#playback{max-width:100%;border-radius:12px}a{color:#f6cb6c}section{border-top:1px solid #493c23;margin-top:22px;padding-top:12px}small{color:#b5ae9f}
-</style></head><body><main><h1>ETERNITY 360</h1><p style="text-align:center">360 Video Booth • Camera & Recording</p>
-<div class="view"><video id="preview" autoplay muted playsinline></video><div class="hint" id="cameraHint">Tap Front Camera or Back Camera to start preview</div></div>
-<div class="controls"><button id="front">Front Camera</button><button id="back">Back Camera</button></div>
-<div class="actions"><button class="primary" id="record" disabled>● Start Recording</button><button id="stop" disabled>■ Stop</button></div>
-<p id="status" role="status" aria-live="polite">Camera permission is needed. Use HTTPS on your phone.</p>
-<section><h3>Video settings</h3><div class="row"><label for="quality">Video quality</label><select id="quality"><option value="720">720p</option><option value="1080">1080p (if supported)</option></select></div><small>Changing camera or quality will stop the current preview. Camera switching is disabled during recording.</small></section>
-<section><h3>Music</h3><label class="filelabel" for="music">Choose music file</label><input id="music" type="file" accept="audio/*" style="display:none"><p id="musicName">No track selected</p><audio id="audio" controls style="width:100%"></audio><small>Music previews separately. This version records camera video (and microphone when allowed); music is not mixed into the saved video.</small></section>
-<section><h3>Gallery / saved recording</h3><input id="gallery" type="file" accept="video/*" aria-label="Open video from gallery"><p><video id="playback" controls playsinline hidden></video></p><a id="download" hidden download="eternity-360-video.webm">Download last recording</a><p><small>Downloads are saved on your device, not uploaded to a server.</small></p></section>
-</main><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080808"><title>Eternity 360</title><style>
+*{box-sizing:border-box}body{margin:0;background:#080808;color:#e9cb85;font-family:system-ui,Arial,sans-serif}main{max-width:640px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 12px max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column}header{height:52px;display:flex;align-items:center;justify-content:space-between}h1{font-size:19px;letter-spacing:2px;margin:0}.icon{height:46px;width:46px;display:grid;place-items:center;background:transparent;color:#f1cb70;border:0;cursor:pointer}.icon svg{width:26px;height:26px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}.icon:disabled{opacity:.4}#stage{position:relative;background:#181818;border-radius:12px;overflow:hidden;flex:1;min-height:260px;max-height:calc(100dvh - 170px)}#preview,#playback,#frame{position:absolute;inset:0;width:100%;height:100%}#preview,#playback{object-fit:cover}#preview.mirror{transform:scaleX(-1)}#frame{pointer-events:none}#hint{position:absolute;inset:auto 10px 12px;background:#0009;color:#fff;padding:9px;text-align:center;border-radius:8px;font-size:13px}#busy{position:absolute;top:12px;left:12px;color:#fff;background:#b5232b;padding:5px 10px;border-radius:15px}#bottom{display:flex;align-items:center;justify-content:space-evenly;min-height:82px}#record{height:68px;width:68px;padding:6px;background:transparent;border:4px solid #fff;border-radius:50%;cursor:pointer;display:grid;place-items:center}#record span{background:#d4323c;border-radius:50%;width:100%;height:100%}#record.recording span{width:25px;height:25px;border-radius:5px}#record:disabled{opacity:.4}#status{color:#bcb3a0;font-size:12px;text-align:center;min-height:22px}#panel{padding:12px 5px;border-top:1px solid #59482b;color:#eee}#panel label{display:block;margin:12px 0 5px}#panel input,#panel select{width:100%;background:#222;color:#fff;padding:9px;border:1px solid #6d572f}#panel button,#panel a{display:inline-block;background:#e8c16b;color:#19130b;border:0;padding:11px;border-radius:8px;text-decoration:none;margin:12px 0;font:inherit}audio{width:100%}small{color:#bbb}[hidden]{display:none!important}
+</style></head><body><main><header><h1>ETERNITY 360</h1><button class="icon" id="settingsBtn" title="Frames & settings" aria-label="Frames and settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg></button></header>
+<div id="stage"><video id="preview" autoplay muted playsinline></video><video id="playback" controls playsinline hidden></video><img id="frame" alt="Selected transparent frame" hidden><div id="hint">Camera permission may be requested</div><span id="busy" hidden>● REC</span></div>
+<div id="bottom"><button class="icon" id="retake" aria-label="Return to camera" title="Return to camera" hidden><svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 3 7"/><path d="M3 4v7h7"/></svg></button><button id="record" aria-label="Start recording" disabled><span></span></button><button class="icon" id="switch" aria-label="Switch front and back camera" title="Switch camera"><svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><path d="M8 12a4 4 0 0 1 7-2m0-3v3h-3M16 14a4 4 0 0 1-7 2m0 3v-3h3"/></svg></button></div>
+<div id="status" role="status" aria-live="polite"></div>
+<section id="panel" hidden><strong>Frames & Settings</strong><label for="frameInput">Add transparent PNG frame</label><input id="frameInput" type="file" accept="image/png,image/webp,image/*"><button id="removeFrame">Remove frame</button><small>Frames are drawn into the recorded video where supported. PNG with transparent center is recommended.</small><label for="quality">Video quality</label><select id="quality"><option value="720">720p</option><option value="1080">1080p (if supported)</option></select><label for="music">Music file (preview only)</label><input id="music" type="file" accept="audio/*"><audio id="audio" controls></audio><small>Music is not mixed into recorded video yet.</small><label for="gallery">Open video from gallery</label><input id="gallery" type="file" accept="video/*"><p><a id="download" hidden>Download video</a></p><p id="shareNotice" hidden>QR video sharing requires secure online video storage and client access setup. The video is currently saved only on your device.</p></section></main><script>
 const $=id=>document.getElementById(id);
-let stream=null,recorder=null,chunks=[],camera='environment',videoURL=null,musicURL=null;
-const setStatus=s=>$('status').textContent=s;
-const setButtons=()=>{let busy=recorder?.state==='recording';$('front').disabled=busy;$('back').disabled=busy;$('front').classList.toggle('active',!!stream&&camera==='user');$('back').classList.toggle('active',!!stream&&camera==='environment');$('record').disabled=!stream||busy;$('stop').disabled=!busy;$('quality').disabled=busy};
+let stream=null,recorder=null,chunks=[],camera='environment',videoURL=null,frameURL=null,frameImage=null,drawStream=null,raf=0,recording=false,opening=0;
+const status=s=>$('status').textContent=s;
+function controls(){ $('record').disabled=!stream&&!recording;$('record').classList.toggle('recording',recording);$('record').setAttribute('aria-label',recording?'Stop recording':'Start recording');$('switch').disabled=recording;$('quality').disabled=recording;$('busy').hidden=!recording;$('retake').hidden=$('playback').hidden; }
 async function openCamera(which){
- if(recorder?.state==='recording')return;
- camera=which;
+ if(recording)return;let n=++opening;camera=which;
  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
- $('preview').srcObject=null;setButtons();setStatus('Opening '+(which==='user'?'front':'back')+' camera…');
- const h=$('quality').value==='1080'?1080:720;
+ $('preview').srcObject=null;$('preview').hidden=false;$('playback').hidden=true;$('frame').hidden=!frameImage;controls();
+ status('Opening '+(which==='user'?'front':'back')+' camera…');
  try{
-  if(!navigator.mediaDevices?.getUserMedia)throw Error('Camera requires HTTPS and a supported browser.');
-  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:which},height:{ideal:h}},audio:true})}
-  catch(e){stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:which},height:{ideal:h}},audio:false})}
-  $('preview').srcObject=stream;$('preview').classList.toggle('mirror',which==='user');$('cameraHint').hidden=true;
-  await $('preview').play().catch(()=>{});
-  const track=stream.getVideoTracks()[0];let actual=track?.getSettings?.().facingMode;
-  setStatus((which==='user'?'Front':'Back')+' camera preview started'+(actual&&actual!==which?' (device selected '+actual+' camera)':'')+'.');
- }catch(e){setStatus('Camera unavailable: '+e.message+'. Allow camera permission in your browser.');$('cameraHint').hidden=false}
- setButtons();
+  if(!navigator.mediaDevices?.getUserMedia)throw Error('Please open the HTTPS link in Chrome or Safari');
+  const h=$('quality').value==='1080'?1080:720;
+  let s;
+  try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:which},height:{ideal:h}},audio:true})}
+  catch(e){s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:which},height:{ideal:h}},audio:false})}
+  if(n!==opening){s.getTracks().forEach(t=>t.stop());return}
+  stream=s;$('preview').srcObject=stream;$('preview').classList.toggle('mirror',which==='user');
+  await $('preview').play().catch(()=>{});$('hint').hidden=true;status(which==='user'?'Front camera':'Back camera');
+ }catch(e){$('hint').hidden=false;$('hint').textContent='Camera unavailable';status(e.message)}
+ controls();
 }
-$('front').onclick=()=>openCamera('user');$('back').onclick=()=>openCamera('environment');
-$('quality').onchange=()=>{if(stream)openCamera(camera)};
+function clearCanvas(){cancelAnimationFrame(raf);if(drawStream){drawStream.getTracks().forEach(t=>t.stop());drawStream=null}}
+function captureSource(){
+ if(!frameImage)return stream;
+ if(!HTMLCanvasElement.prototype.captureStream){status('Frame capture not supported; camera only');return stream}
+ const cv=document.createElement('canvas'),v=$('preview');cv.width=v.videoWidth||720;cv.height=v.videoHeight||1280;const ctx=cv.getContext('2d');
+ function draw(){
+  if(!recording)return;
+  let cw=cv.width,ch=cv.height;ctx.clearRect(0,0,cw,ch);
+  if(v.readyState>=2){let vw=v.videoWidth,vh=v.videoHeight,s=Math.max(cw/vw,ch/vh),w=vw*s,h=vh*s;ctx.save();if(camera==='user'){ctx.translate(cw,0);ctx.scale(-1,1)}ctx.drawImage(v,(cw-w)/2,(ch-h)/2,w,h);ctx.restore()}
+  if(frameImage.complete&&frameImage.naturalWidth)ctx.drawImage(frameImage,0,0,cw,ch);
+  raf=requestAnimationFrame(draw);
+ }
+ draw();drawStream=cv.captureStream(30);let audio=stream.getAudioTracks()[0];if(audio)drawStream.addTrack(audio);return drawStream;
+}
+function showVideo(blob){
+ if(videoURL)URL.revokeObjectURL(videoURL);videoURL=URL.createObjectURL(blob);
+ $('playback').src=videoURL;$('playback').hidden=false;$('preview').hidden=true;$('frame').hidden=true;
+ $('download').href=videoURL;$('download').download='eternity-360-'+Date.now()+(blob.type.includes('mp4')?'.mp4':'.webm');$('download').hidden=false;
+ $('shareNotice').hidden=false;status('Video ready. Play it or download from Settings.');controls();$('playback').play().catch(()=>{});
+}
 $('record').onclick=()=>{
- if(!stream||typeof MediaRecorder==='undefined'){setStatus('Recording not supported in this browser.');return}
+ if(recording){recording=false;recorder.stop();clearCanvas();controls();return}
+ if(!stream||typeof MediaRecorder==='undefined'){status('Recording is unsupported here');return}
  try{
-  const types=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'];const type=types.find(t=>MediaRecorder.isTypeSupported(t));
-  recorder=new MediaRecorder(stream,type?{mimeType:type}:undefined);chunks=[];
+  recording=true;const source=captureSource();
+  const formats=['video/webm;codecs=vp8,opus','video/webm','video/mp4'];
+  const type=formats.find(t=>MediaRecorder.isTypeSupported(t));
+  recorder=new MediaRecorder(source,type?{mimeType:type}:undefined);chunks=[];
   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-  recorder.onerror=e=>setStatus('Recording error: '+(e.error?.message||'unknown'));
-  recorder.onstop=()=>{const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});if(videoURL)URL.revokeObjectURL(videoURL);videoURL=URL.createObjectURL(blob);$('playback').src=videoURL;$('playback').hidden=false;$('download').href=videoURL;$('download').download='eternity-360-'+Date.now()+((blob.type.includes('mp4'))?'.mp4':'.webm');$('download').hidden=false;setStatus('Recording saved. Tap Download to keep it on your phone.');setButtons()};
-  recorder.start(250);setStatus('Recording in progress…');setButtons();
- }catch(e){setStatus('Could not record: '+e.message)}
+  recorder.onerror=e=>status('Recording error: '+(e.error?.message||'unknown'));
+  recorder.onstop=()=>{clearCanvas();if(chunks.length)showVideo(new Blob(chunks,{type:recorder.mimeType||'video/webm'}));else status('No recording captured. Please retry.')};
+  recorder.start(250);status('Recording. Tap red square to stop.');controls();
+ }catch(e){recording=false;clearCanvas();status('Recording error: '+e.message);controls()}
 };
-$('stop').onclick=()=>{if(recorder?.state==='recording'){recorder.stop();setButtons()}};
-$('gallery').onchange=e=>{const f=e.target.files?.[0];if(!f)return;if(videoURL)URL.revokeObjectURL(videoURL);videoURL=URL.createObjectURL(f);$('playback').src=videoURL;$('playback').hidden=false;$('download').hidden=true;setStatus('Gallery video loaded for playback.')};
-$('music').onchange=e=>{const f=e.target.files?.[0];if(!f)return;if(musicURL)URL.revokeObjectURL(musicURL);musicURL=URL.createObjectURL(f);$('audio').src=musicURL;$('musicName').textContent=f.name};
-window.addEventListener('pagehide',()=>stream?.getTracks().forEach(t=>t.stop()));
-setButtons();
+$('switch').onclick=()=>openCamera(camera==='user'?'environment':'user');
+$('settingsBtn').onclick=()=>{$('panel').hidden=!$('panel').hidden};
+$('retake').onclick=()=>{$('playback').pause();$('playback').hidden=true;$('preview').hidden=false;$('frame').hidden=!frameImage;status('Ready to record');controls()};
+$('frameInput').onchange=e=>{const f=e.target.files?.[0];if(!f)return;if(frameURL)URL.revokeObjectURL(frameURL);frameURL=URL.createObjectURL(f);const img=new Image();img.onload=()=>{frameImage=img;$('frame').src=frameURL;$('frame').hidden=!$('playback').hidden;status('Frame added. Ready to record.')};img.onerror=()=>status('Could not open this frame');img.src=frameURL};
+$('removeFrame').onclick=()=>{frameImage=null;$('frame').hidden=true;$('frame').removeAttribute('src');status('Frame removed')};
+$('quality').onchange=()=>openCamera(camera);
+$('music').onchange=e=>{const f=e.target.files?.[0];if(f)$('audio').src=URL.createObjectURL(f)};
+$('gallery').onchange=e=>{const f=e.target.files?.[0];if(f){$('playback').src=URL.createObjectURL(f);$('playback').hidden=false;$('preview').hidden=true;$('frame').hidden=true;status('Gallery video loaded');controls()}};
+window.addEventListener('pagehide',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());clearCanvas()});
+controls();openCamera('environment');
 </script></body></html>
