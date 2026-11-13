@@ -77,7 +77,7 @@ async function openSharedVideo(){
 
 function stopProgress(complete=false){cancelAnimationFrame(progressRaf);progressRaf=0;if(complete){$('record').style.setProperty('--record-progress','100%')}else{$('record').style.removeProperty('--record-progress');$('recordTime').textContent=''}}
 function startProgress(seconds){stopProgress();recordDurationMs=seconds*1000;recordStartedAt=performance.now();function tick(now){if(!recording)return;const elapsed=Math.min(recordDurationMs,Math.max(0,now-recordStartedAt));$('record').style.setProperty('--record-progress',(elapsed/recordDurationMs*100).toFixed(2)+'%');$('recordTime').textContent=Math.max(0,Math.ceil((recordDurationMs-elapsed)/1000))+'s';progressRaf=requestAnimationFrame(tick)}progressRaf=requestAnimationFrame(tick)}
-function controls(){ $('zoom').disabled=recording;$('duration').disabled=recording;$('effects').disabled=recording; $('record').disabled=!stream&&!recording;$('record').classList.toggle('recording',recording);$('record').setAttribute('aria-label',recording?'Stop recording':'Start recording');$('switch').disabled=recording;$('quality').disabled=recording;$('busy').hidden=!recording;$('retake').hidden=$('playback').hidden; }
+function controls(){ $('zoom').disabled=recording;$('duration').disabled=recording;$('effects').disabled=recording||$('duration').value==='30'; $('record').disabled=!stream&&!recording;$('record').classList.toggle('recording',recording);$('record').setAttribute('aria-label',recording?'Stop recording':'Start recording');$('switch').disabled=recording;$('quality').disabled=recording;$('busy').hidden=!recording;$('retake').hidden=$('playback').hidden; }
 async function openCamera(which){
  if(recording)return;let n=++opening;camera=which;
  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
@@ -257,7 +257,8 @@ $('frameInput').onchange=e=>{
 $('removeFrame').onclick=()=>{frameImage=null;if(frameURL)URL.revokeObjectURL(frameURL);frameURL=null;$('frame').hidden=true;$('frame').removeAttribute('src');assetDel('frame').catch(()=>{});status('Saved frame removed')};
 $('quality').onchange=()=>openCamera(camera);
 $('zoom').onchange=()=>{localStorage.setItem('eternity360-zoom',$('zoom').value);applyZoom()};
-$('duration').onchange=()=>{localStorage.setItem('eternity360-duration',$('duration').value);status('Auto-stop after '+$('duration').value+' seconds')};
+function syncDurationEffects(){const normal=$('duration').value==='30';$('effects').disabled=normal||recording;$('effectHelp').textContent=normal?'30 seconds: Normal video only. No automatic zoom, slow motion, or reverse.':'40 sec: 10 normal + 10 zoom + 10 slow replay + 10 reverse replay. 50 sec: 20 normal + 10 zoom + 10 slow replay + 10 reverse replay. Video stays 40/50 sec.';}
+ $('duration').onchange=()=>{localStorage.setItem('eternity360-duration',$('duration').value);syncDurationEffects();status($('duration').value==='30'?'30 seconds: normal video only, no automatic effects':'Auto-stop after '+$('duration').value+' seconds')};
 $('finishBeeps').onchange=()=>localStorage.setItem('eternity360-beeps',$('finishBeeps').value);
 $('effects').onchange=()=>{localStorage.setItem('eternity360-effects',$('effects').value);status('Automatic effects: '+$('effects').value)};
 $('music').onchange=e=>{const f=e.target.files?.[0];if(!f)return;applyMusic(f);assetSet('music',f).then(()=>status('Music saved for every future recording: '+f.name)).catch(()=>status('Music loaded, but could not be saved for next visit.'))};
@@ -268,5 +269,6 @@ if(['0.5','1','2'].includes(localStorage.getItem('eternity360-zoom')))$('zoom').
 if(['30','40','50'].includes(localStorage.getItem('eternity360-duration')))$('duration').value=localStorage.getItem('eternity360-duration');
 if(['on','off'].includes(localStorage.getItem('eternity360-effects')))$('effects').value=localStorage.getItem('eternity360-effects');
 if(['0','1','2','3'].includes(localStorage.getItem('eternity360-beeps')))$('finishBeeps').value=localStorage.getItem('eternity360-beeps');
+ syncDurationEffects();
 controls();if(new URLSearchParams(location.search).has('share')){$('viewerPanel').hidden=false;$('bottom').hidden=true;$('hint').hidden=true;$('status').hidden=true;openSharedVideo()}else{restoreAssets();openCamera('environment')}
 </script></body></html>
