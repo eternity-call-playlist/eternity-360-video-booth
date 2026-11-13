@@ -31,13 +31,28 @@ async function openCamera(which){
  try{
   if(!navigator.mediaDevices?.getUserMedia)throw Error('Please open the HTTPS link in Chrome or Safari');
   const h=$('quality').value==='1080'?1080:720;
-  let s;
-  try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:which},height:{ideal:h}},audio:true})}
-  catch(e){s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:which},height:{ideal:h}},audio:false})}
+  let s,lastError;
+  const options=[
+   {video:{facingMode:{ideal:which},height:{ideal:h}},audio:true},
+   {video:{facingMode:{ideal:which},height:{ideal:h}},audio:false},
+   {video:{facingMode:which},audio:false},
+   {video:true,audio:false}
+  ];
+  for(const option of options){
+   try{s=await navigator.mediaDevices.getUserMedia(option);break}
+   catch(e){lastError=e;if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError'||e.name==='SecurityError')break}
+  }
+  if(!s)throw lastError||Error('Camera access failed');
   if(n!==opening){s.getTracks().forEach(t=>t.stop());return}
   stream=s;$('preview').srcObject=stream;$('preview').classList.toggle('mirror',which==='user');
   await $('preview').play().catch(()=>{});$('hint').hidden=true;status(which==='user'?'Front camera':'Back camera');
- }catch(e){$('hint').hidden=false;$('hint').textContent='Camera unavailable';status(e.message)}
+ }catch(e){
+  $('hint').hidden=false;
+  const tip=(e.name==='NotAllowedError'||e.name==='PermissionDeniedError')?'Allow camera permission in Chrome settings.':(e.name==='NotReadableError'||e.name==='TrackStartError')?'Close other apps using the camera, then retry.':'Try the other camera or open in Chrome.';
+  $('hint').innerHTML='Camera unavailable<br><button id="retryCamera" type="button" style="margin-top:12px;padding:10px 18px;color:#111;background:#e8c16b;border:0;border-radius:18px">Retry Camera</button>';
+  $('retryCamera').onclick=()=>openCamera(camera);
+  status((e.message||'Camera error')+' — '+tip);
+ }
  controls();
 }
 function clearCanvas(){cancelAnimationFrame(raf);if(drawStream){drawStream.getTracks().forEach(t=>t.stop());drawStream=null}}
