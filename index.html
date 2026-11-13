@@ -88,8 +88,8 @@ async function openCamera(which){
   const highQuality=$('quality').value==='1080';const w=highQuality?1080:720,h=highQuality?1920:1280;
   let s,lastError;
   const options=[
-   {video:{facingMode:{ideal:which},width:{ideal:w},height:{ideal:h},aspectRatio:{ideal:9/16}},audio:true},
-   {video:{facingMode:{ideal:which},width:{ideal:w},height:{ideal:h},aspectRatio:{ideal:9/16}},audio:false},
+   {video:{facingMode:{ideal:which},width:{ideal:w},height:{ideal:h},aspectRatio:{ideal:9/16},frameRate:{ideal:30,max:30}},audio:true},
+   {video:{facingMode:{ideal:which},width:{ideal:w},height:{ideal:h},aspectRatio:{ideal:9/16},frameRate:{ideal:30,max:30}},audio:false},
    {video:{facingMode:which},audio:false},
    {video:true,audio:false}
   ];
@@ -141,8 +141,7 @@ async function audioForRecording(){
 
 function captureSource(){
  const duration=Number($('duration').value),effects=$('effects').value==='on'&&duration>=40;
- // Always encode the same mirrored front-camera orientation as the preview;
-  // otherwise the raw camera stream reverses left/right in downloaded videos.
+ // Preserve the same unmirrored orientation in preview and downloaded video.
   const needCanvas=true;
  if(!needCanvas)return stream;
  if(!HTMLCanvasElement.prototype.captureStream){if(effects)throw Error('Video effects need canvas recording support');return stream}
@@ -151,12 +150,12 @@ function captureSource(){
   // Cover-crop to fill the screen instead of stretching people or their clothing.
   const portraitWidth=$('quality').value==='1080'?1080:720;
   cv.width=portraitWidth;cv.height=Math.round(portraitWidth*16/9);
- const ctx=cv.getContext('2d'),scaleWidth=Math.min(cv.width,320);
+ const ctx=cv.getContext('2d',{alpha:false}),scaleWidth=Math.min(cv.width,540);
  const sampleW=scaleWidth,sampleH=Math.round(scaleWidth*cv.height/cv.width);
 
 
  const normalEnd=duration-30,boomEnd=duration-20,reverseEnd=duration-10;
- const frames=[],interval=125;let begin=performance.now(),lastSample=-Infinity;
+ const frames=[],interval=100;let begin=performance.now(),lastSample=-Infinity,lastDraw=-Infinity;
  const drawLive=()=>{
   const cw=cv.width,ch=cv.height;ctx.clearRect(0,0,cw,ch);
   if(v.readyState>=2){
@@ -175,7 +174,11 @@ function captureSource(){
  };
  function draw(){
   if(!recording)return;
-  const elapsed=(performance.now()-begin)/1000;
+  const now=performance.now();
+  // Limit expensive full-resolution canvas paints to 30 fps on high-refresh-rate phones.
+  if(now-lastDraw<33){raf=requestAnimationFrame(draw);return}
+  lastDraw=now;
+  const elapsed=(now-begin)/1000;
   if(!effects||elapsed<normalEnd){
    drawLive();overlay();
    if(effects&&elapsed>=normalEnd-5&&performance.now()-lastSample>=interval){
@@ -211,11 +214,15 @@ $('record').onclick=async()=>{
   const source=new MediaStream(tracks);
   const formats=['video/webm;codecs=vp8,opus','video/webm','video/mp4'];
   const type=formats.find(t=>MediaRecorder.isTypeSupported(t));
-  recorder=new MediaRecorder(source,type?{mimeType:type}:undefined);chunks=[];
+  // Request a high enough bitrate to preserve moving faces and detail; browsers may cap it.
+  const targetBitrate=$('quality').value==='1080'?10000000:6000000;
+  const recorderOptions={videoBitsPerSecond:targetBitrate};
+  if(type)recorderOptions.mimeType=type;
+  recorder=new MediaRecorder(source,recorderOptions);chunks=[];
   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
   recorder.onerror=e=>status('Recording error: '+(e.error?.message||'unknown'));
   recorder.onstop=()=>{stopProgress(autoFinished);if(recordTimer)clearTimeout(recordTimer);recordTimer=null;clearCanvas();stopSound();if(autoFinished)playFinishBeeps();if(chunks.length)showVideo(new Blob(chunks,{type:recorder.mimeType||'video/webm'}));else status('No recording captured. Please retry.');autoFinished=false};
-  recorder.start(250);startProgress(Number($('duration').value));recordTimer=setTimeout(()=>{if(recording&&recorder?.state==='recording'){autoFinished=true;stopProgress(true);recording=false;recorder.stop();controls()}},Number($('duration').value)*1000);status('Recording '+$('duration').value+' seconds'+($('effects').value==='on'&&Number($('duration').value)>=40?' with boomerang, reverse and slow motion':'')+'. Tap red square to stop early.');controls();
+  recorder.start(1000);startProgress(Number($('duration').value));recordTimer=setTimeout(()=>{if(recording&&recorder?.state==='recording'){autoFinished=true;stopProgress(true);recording=false;recorder.stop();controls()}},Number($('duration').value)*1000);status('Recording '+$('duration').value+' seconds'+($('effects').value==='on'&&Number($('duration').value)>=40?' with boomerang, reverse and slow motion':'')+'. Tap red square to stop early.');controls();
  }catch(e){stopProgress();recording=false;if(recordTimer)clearTimeout(recordTimer);recordTimer=null;clearCanvas();stopSound();status('Recording error: '+e.message);controls()}
 };
 $('switch').onclick=()=>openCamera(camera==='user'?'environment':'user');
