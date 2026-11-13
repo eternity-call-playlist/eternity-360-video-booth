@@ -99,7 +99,7 @@ async function openCamera(which){
   }
   if(!s)throw lastError||Error('Camera access failed');
   if(n!==opening){s.getTracks().forEach(t=>t.stop());return}
-  stream=s;$('preview').srcObject=stream;$('preview').classList.toggle('mirror',which==='user');
+  stream=s;$('preview').srcObject=stream;$('preview').classList.remove('mirror');
   await $('preview').play().catch(()=>{});$('hint').hidden=true;await applyZoom(false);status(which==='user'?'Front camera':'Back camera');
  }catch(e){
   $('hint').hidden=false;
@@ -113,12 +113,12 @@ async function openCamera(which){
 async function applyZoom(notify=true){
  const target=$('duration').value==='30'?1:Number($('zoom').value),track=stream?.getVideoTracks()?.[0];if(!track)return;
  const caps=track.getCapabilities?.()||{};zoomValue=target;zoomHardware=false;
- $('preview').style.transform=(camera==='user'?'scaleX(-1) ':'')+'scale(1)';
+ $('preview').style.transform='scale(1)';
  if(caps.zoom&&target>=caps.zoom.min&&target<=caps.zoom.max){
    try{await track.applyConstraints({advanced:[{zoom:target}]});zoomHardware=true;$('zoomHelp').textContent=target+'x camera zoom active';if(notify)status(target+'x camera zoom set');return}catch(e){}
  }
  if(target===0.5){zoomValue=1;$('zoom').value='1';$('zoomHelp').textContent='0.5x ultrawide is not exposed by this phone/browser. Keeping 1x.';if(notify)status('0.5x not supported by this camera. Using 1x.');return}
- if(target===2){$('preview').style.transform=(camera==='user'?'scaleX(-1) ':'')+'scale(2)';$('zoomHelp').textContent='2x digital crop active; recording includes the crop.';if(notify)status('2x digital zoom active');return}
+ if(target===2){$('preview').style.transform='scale(2)';$('zoomHelp').textContent='2x digital crop active; recording includes the crop.';if(notify)status('2x digital zoom active');return}
  $('zoomHelp').textContent='1x normal zoom active';if(notify)status('1x normal zoom active');
 }
 function clearCanvas(){cancelAnimationFrame(raf);if(drawStream){drawStream.getVideoTracks().forEach(t=>t.stop());drawStream=null}}
@@ -162,7 +162,7 @@ function captureSource(){
   if(v.readyState>=2){
    const vw=v.videoWidth,vh=v.videoHeight,fit=Math.min(cw/vw,ch/vh);
    const factor=duration===30?1:(zoomHardware?1:zoomValue),w=vw*fit*factor,h=vh*fit*factor;
-   ctx.save();if(camera==='user'){ctx.translate(cw,0);ctx.scale(-1,1)}
+   ctx.save();/* Keep front and back camera in natural, unmirrored orientation. */
    ctx.drawImage(v,(cw-w)/2,(ch-h)/2,w,h);ctx.restore();
   }
  };
